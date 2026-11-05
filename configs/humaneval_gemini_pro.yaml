@@ -1,0 +1,34 @@
+# Gemini 2.5 Pro — effect of thinking on reproducibility
+# File names encode sampling only: tem_<t>_thinking_<budget>.jsonl (Gemini-specific; top_p/top_k are dropped)
+# Note: Pro cannot disable thinking (budget=0 is clamped by the provider to a minimum of ~128).
+model:
+  provider: openrouter
+  model_id: google/gemini-2.5-pro
+
+  # max_new_tokens = visible output budget. The thinking budget is added on top automatically:
+  #   max_tokens actually sent to the API = max_new_tokens + thinking.budget
+  max_new_tokens: 4096
+
+  do_sample: true
+  temperature: 0.6
+  top_p: 0.95
+  top_k: null
+
+  # ===== thinking switch (adjust thinking size) =====
+  # Change budget to switch levels; the file name becomes tem_0.6_thinking_<budget>.
+  thinking:
+    enabled: true
+    budget: 1024        # pro options: 128 (minimum) / 1024 / 4096 / 8192 / 16384 / 32768
+    exclude: true       # do not return thinking text (tokens still count toward the budget)
+    # Dynamic thinking: delete the budget line above (keep enabled: true) → file name thinking_dynamic
+
+experiment:
+  dataset: humaneval
+  dataset_path: "src/datasets/HumanEval.jsonl"
+  num_tasks: 164
+  num_samples: 10
+  timeout_sec: 20
+
+prompt:
+#  template: "humaneval_original"
+  template: "humaneval_few_shot"

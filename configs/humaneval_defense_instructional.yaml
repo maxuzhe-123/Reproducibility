@@ -1,0 +1,41 @@
+model:
+  provider: openrouter
+#  model_id: "qwen/qwen-2.5-7b-instruct"
+#  model_id: "qwen/qwen3-coder-next"
+#  model_id: deepseek/deepseek-chat-v3.1
+#  model_id: anthropic/claude-sonnet-4.6
+#  model_id: openai/gpt-5.1-codex
+  model_id: deepseek/deepseek-v3.2
+#  model_id: qwen/qwen3-coder-30b-a3b-instruct
+#  model_id: google/gemini-2.5-flash
+  stop_strings: ["Stop."]
+  max_new_tokens: 4096
+  do_sample: true
+  temperature: 0.6
+  top_p: 0.95
+  top_k: 20
+
+  # ===== thinking switch (Gemini thinking budget) =====
+  # The max_tokens actually sent to the API = max_new_tokens + thinking.budget.
+  # Change budget to switch levels; the file name becomes ..._thinking_<budget>.
+#  reasoning:
+#    effort: low
+#    exclude: true
+#    budget: 1024        # flash options: 0 (off) / 512 / 1024 / 4096 / 8192 / 16384 / 24576
+#    exclude: true       # do not return thinking text (tokens still count toward the budget)
+
+experiment:
+  dataset: humaneval
+  dataset_path: "src/datasets/HumanEval.jsonl"
+#  name: humaneval_defense_instructional
+#  out_dir: runs/
+  num_tasks: 164
+#  num_tasks: 2
+  num_samples: 10
+  timeout_sec: 50
+
+prompt:
+  # defense=instructional automatically appends the "_instructional" suffix to the template,
+  # so the base template humaneval_original is used here (the effective template is humaneval_original_instructional).
+  template: "humaneval_original"
+  defense: "instructional"

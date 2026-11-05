@@ -1,0 +1,59 @@
+# ================================================================
+# HumanEval defense experiment template
+# Defenses evaluated in the paper; switch by changing prompt.defense only:
+#
+#   no             baseline, no defense
+#   delimiters     surround the problem description with ```
+#   instructional  append an anti-injection statement to the instruction
+#   paraphrasing   paraphrase the docstring with an LM before submission
+#   sandwich       append a task reminder to the end of the full prompt
+#   retokenization random subword segmentation of the problem description with BPE dropout
+# ================================================================
+
+model:
+  provider: openrouter
+#  model_id: "qwen/qwen-2.5-7b-instruct"
+#  model_id: deepseek/deepseek-chat-v3.1
+#  model_id: anthropic/claude-sonnet-4.6
+#  model_id: openai/gpt-5.1-codex
+  model_id: deepseek/deepseek-v3.2
+#  model_id: "qwen/qwen3-coder-next"
+#  model_id: google/gemini-2.5-flash
+  stop_strings: ["Stop."]
+  max_new_tokens: 4096
+  do_sample: true
+  temperature: 0.6
+  top_p: 0.95
+  top_k: 20
+
+  # ===== thinking switch (Gemini thinking budget) =====
+  # The max_tokens actually sent to the API = max_new_tokens + thinking.budget.
+  # Change budget to switch levels; the file name becomes ..._thinking_<budget>.
+#  reasoning:
+#    effort: low
+#    exclude: true
+#    budget: 1024        # flash options: 0 (off) / 512 / 1024 / 4096 / 8192 / 16384 / 24576
+#    exclude: true       # do not return thinking text (tokens still count toward the budget)
+
+experiment:
+  dataset: humaneval
+  dataset_path: "src/datasets/HumanEval.jsonl"
+#  name: humaneval_defense_delimiters        # ← keep consistent with the defense name to distinguish output directories
+#  out_dir: runs/humaneval
+  num_tasks: 164
+#  num_tasks: 2
+  num_samples: 10                   # k=10, needed for pairwise metrics to be meaningful
+#  num_samples: 2
+  timeout_sec: 50
+
+prompt:
+  template: "humaneval_original"          # instructional automatically switches to humaneval_original_instructional
+  defense: "delimiters"                     # ← change this to switch the defense
+
+# ── Defense-specific parameters ──────────────────────────────────────────
+defense_cfg:
+  retokenization:
+    vocab_path: "data/subword_nmt.voc"
+
+
+

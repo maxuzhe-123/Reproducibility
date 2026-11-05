@@ -1,0 +1,70 @@
+# ================================================================
+# Experiment: CoderEval — With RAG (RepoCoder RG1)
+# ----------------------------------------------------------------
+# Prompt source : CoderEval-ALL.jsonl + RepoCoder RG1 retrieval augmentation
+#               (one-gram, window=20, slice=2) + lsp-context
+# RAG        : rg1
+# Evaluation : runner.eval_one + PythonExec
+# ================================================================
+
+model:
+  provider: openrouter
+#  model_id: "qwen/qwen-2.5-7b-instruct"
+#  model_id: qwen/qwen-2.5-72b-instruct
+#  model_id: "qwen/qwen3-coder-next"
+#  --- Gemini 2.5 (for thinking experiments, uncomment one of these and enable the thinking block below) ---
+#  model_id: google/gemini-2.5-pro
+#  model_id: google/gemini-2.5-flash
+#  model_id: google/gemini-2.5-flash-lite
+#  model_id: deepseek/deepseek-v3.2
+#  model_id: anthropic/claude-sonnet-4.6
+  model_id: openai/gpt-5.1-codex
+  stop_strings: ["Stop."]
+  max_new_tokens: 65536
+  # --- pass@1 deterministic mode ---
+  do_sample: true
+  temperature: 0.6
+  # --- pass@10 diversity sampling (uncomment when switching, and set num_samples to 10) ---
+  # do_sample: true
+  # temperature: 0.2
+  top_p: 0.95
+  top_k: null
+  reasoning:
+    effort: low
+    exclude: true
+
+  # ===== thinking switch (only effective for Gemini/Claude; uncomment when running thinking experiments with Gemini) =====
+  # When enabled, the file name becomes tem_<t>_thinking_<budget|effort> (top_p/top_k are dropped automatically).
+  # Pro cannot disable thinking (minimum ~128); flash / flash-lite can (enabled: false or budget: 0).
+  # Note: when thinking is enabled for Claude, temperature must be 1.0 (Gemini has no such restriction).
+#  thinking:
+#    enabled: true
+##    mode: budget          # budget | effort — whichever is chosen is sent
+#    budget: 1024          # mode=budget: pro 1024/4096/8192…; flash(-lite) 0 (off)/512/1024/4096…
+##    effort: high          # mode=effort: low / medium / high / max
+#    exclude: true         # do not return thinking text (tokens still count toward the budget)
+
+experiment:
+  dataset: codereval
+#  name: codereval_rag_rg1
+#  out_dir: runs/codereval
+#  out_dir: runs/codereval_test
+  num_tasks: 230   # Full experiment
+#  num_tasks: 2      # debugging
+  num_samples: 10    # pass@1; set to 10 for diversity sampling
+  timeout_sec: 20
+
+prompt:
+  template: "codereval"
+
+codereval:
+  dataset_path: src/datasets/CoderEval-ALL.jsonl
+  index_path: src/datasets/CoderEval/CoderEval4Python.json
+  repos_root: repos
+
+rag:
+  mode: rg1
+  window_sizes: [20]
+  slice_sizes: [2]
+  retriever: one-gram
+  top_k: 3

@@ -1,0 +1,28 @@
+# ============================================================
+# CodeJudgeBench — pipeline_v2 two-stage run (preds + eval)
+# Generation: the model acts as a judge (pairwise protocol), reads the problem + two candidate solutions (A/B)
+#       and outputs a verdict, [[A>B]] or [[B>A]].
+# Evaluation: parse the verdict and compare it with the gold label → Repro / ReproCorrect,
+#       for forward and reversed candidate order, bucketed by difficulty
+# ============================================================
+model:
+  provider: openrouter
+  model_id: qwen/qwen3-coder-next
+  max_new_tokens: 32768     # ⚠️ Too small a limit can truncate the output before [[A>B]] → empty verdict → counted as wrong
+  do_sample: true
+  temperature: 0.0          # Must be >0 for the num_samples samples to differ (otherwise pass@k is not discriminative)
+  top_p: 0.95
+  top_k: 20
+
+experiment:
+  dataset: codejudgebench
+  dataset_path: "src/datasets/CodeJudgeBench/codegen.jsonl"
+  num_tasks: all           # Take the first N problems (each expands to 1 or 2 instances depending on position_mode); all/empty = all 2103
+  num_samples: 10
+
+prompt:
+  template: codejudgebench  # Only used for naming the result directory
+
+codejudge:
+  # Same as the original work: both = evaluate each problem once in each A/B order (removes position bias); forward = pos only in A; reverse = pos only in B
+  position_mode: both

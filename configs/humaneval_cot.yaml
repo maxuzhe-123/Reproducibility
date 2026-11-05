@@ -1,0 +1,50 @@
+model:
+  provider: openrouter
+#  model_id: openai/gpt-4o
+#  model_id: "qwen/qwen-2.5-7b-instruct"
+#  model_id: qwen/qwen3-coder-next
+#  model_id: google/gemini-2.5-flash
+#  model_id: google/gemini-2.5-pro
+  model_id: openai/gpt-5.1-codex
+#  model_id: qwen/qwen-2.5-72b-instruct
+#  model_id: qwen/qwen-2.5-coder-32b-instruct
+  #  model_id: qwen/qwen3-coder-30b-a3b-instruct
+#  model_id: qwen/qwen3-coder-flash
+#  model_id: deepseek/deepseek-chat-v3.1
+#  provider: qwen
+#  model_id: Qwen/Qwen2.5-3B-Instruct
+#  model_id: qwen/qwq-32b
+  stop_strings: ["Stop."]
+  max_new_tokens: 8192
+  do_sample: true                          # ✅ sampling enabled, otherwise Pass@k is meaningless
+#  logprobs: 5        # return the top-5 candidates and probabilities for each token
+#  return_probs: true # field used in openrouter.py
+  temperature: 0.6                        # Sampling parameters (passed conditionally in generate)
+  top_p: 0.95
+  top_k: null
+  reasoning:
+    effort: low
+    exclude: true
+
+#  thinking:
+#    enabled: true
+#    budget: 1024        # pro options: 128 (minimum) / 1024 / 4096 / 8192 / 16384 / 32768
+#    exclude: true       # do not return thinking text (tokens still count toward the budget)
+    # Dynamic thinking: delete the budget line above (keep enabled: true) → file name thinking_dynamic
+
+experiment:
+  dataset: humaneval
+  dataset_path: "src/datasets/HumanEval.jsonl"
+#  name: qwen_humaneval
+#  name: humaneval_cot
+#  out_dir: runs/humaneval_test
+  num_tasks: 164
+#  num_tasks: 10
+  num_samples: 10
+  timeout_sec: 20
+
+prompt:
+  template: "humaneval_cot"
+
+
+

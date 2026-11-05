@@ -1,0 +1,19 @@
+# Python 3.11 (versions as used in the experiments)
+numpy==2.4.0
+scipy==1.16.3
+matplotlib==3.10.8
+PyYAML==6.0.3
+requests==2.32.5
+tqdm==4.67.1
+
+# Tree-sitter parsers used by CodeBLEU.
+# CodeBLEU itself is installed separately with --no-deps (see README):
+# codebleu 0.7.0 declares tree-sitter<0.23, but the experiments ran with tree-sitter 0.25.2.
+tree-sitter==0.25.2
+tree-sitter-python==0.25.0
+tree-sitter-language-pack==1.8.1
+
+# Tokenizers and RepoCoder retrieval utilities
+transformers==4.57.3
+tiktoken==0.12.0
+editdistance==0.8.1

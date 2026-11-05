@@ -1,0 +1,38 @@
+# Gemini 2.5 Flash — effect of thinking on reproducibility
+# File names encode sampling only: tem_<t>_thinking_<budget>.jsonl (Gemini-specific; top_p/top_k are dropped)
+# Flash can disable thinking completely: set thinking.enabled to false (or budget: 0) → file name thinking_0.
+model:
+  provider: openrouter
+  model_id: google/gemini-2.5-flash
+#  model_id: google/gemini-2.5-flash-lite
+
+  # max_new_tokens = visible output budget. The thinking budget is added on top automatically:
+  #   max_tokens actually sent to the API = max_new_tokens + thinking.budget
+  max_new_tokens: 4096
+
+  do_sample: true
+  temperature: 0.6
+  top_p: 0.95
+  top_k: null
+
+  # ===== thinking switch (adjust thinking size) =====
+  # Change budget to switch levels; the file name becomes tem_0.6_thinking_<budget>.
+  thinking:
+    enabled: true
+    budget: 1024        # flash options: 0 (off) / 512 / 1024 / 4096 / 8192 / 16384 / 24576
+    exclude: true       # do not return thinking text (tokens still count toward the budget)
+    # Baseline without thinking: enabled: false (or budget: 0) → file name thinking_0
+    # Dynamic thinking: delete the budget line (keep enabled: true) → file name thinking_dynamic
+
+experiment:
+  dataset: humaneval
+  dataset_path: "src/datasets/HumanEval.jsonl"
+  num_tasks: 164
+#  num_tasks: 3
+  num_samples: 10
+  timeout_sec: 20
+
+prompt:
+#  template: "humaneval_original"
+  template: "humaneval_cot"
+#  template: "humaneval_few_shot"
